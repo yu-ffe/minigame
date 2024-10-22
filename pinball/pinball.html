@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head> </head>
+  <body>
+    <div id="field">
+      <div id="ball"></div>
+    </div>
+  </body>
+</html>
+
+<style>
+  body {
+    background-color: black;
+  }
+  #field {
+    position: absolute;
+    background-color: mediumaquamarine;
+    border: 2px solid white;
+    top: 5%;
+    left: 5%;
+    width: 560px;
+    height: 760px;
+  }
+  #ball {
+    position: absolute;
+    background-color: black;
+    width: 30px;
+    height: 30px;
+  }
+</style>
+
+<script>
+  class PinBall {
+    ball_x = 30;
+    ball_y = 30; // 기본 위치
+    ball_speed_x = 0;
+    ball_speed_y = 0;
+
+    gravity = 0.98; // 떨어지는 속도
+    resistance = 0.075; // 일반 저항 수치
+    speed_manager = 0.1;
+
+    operation_speed() {
+      this.ball_speed_y += this.gravity;
+
+      this.ball_speed_x -= (this.ball_speed_x * this.resistance) / 10;
+      this.ball_speed_y -= (this.ball_speed_y * this.resistance) / 10;
+    }
+
+    detect_around_ball() {
+      if (this.ball_x < 30 || this.ball_x >= 530) this.ball_speed_x = -this.ball_speed_x;
+      if (this.ball_y < 30 || this.ball_y >= 730) this.ball_speed_y = -this.ball_speed_y;
+      if (this.ball_y >= 730 && -0.1 <= this.ball_speed_y && this.ball_speed_y <= 0.1) this.ball_speed_y = 0;
+    }
+
+    move_ball() {
+      this.ball_x += this.ball_speed_x;
+      this.ball_y += this.ball_speed_y;
+    }
+
+    draw_ball() {
+      document.getElementById("ball").style.left = this.ball_x + "px";
+      document.getElementById("ball").style.top = this.ball_y + "px";
+    }
+
+    run() {
+      this.operation_speed(); // 속도 업데이트
+      this.detect_around_ball(); // 주위에 블럭있으면 움직임 변경 다음 프레임 미리계산
+      this.move_ball(); // 움직이고
+      this.draw_ball(); // 그리기
+    }
+  }
+  let game_speed = 30; // 1000 = 1초
+  let game = new PinBall();
+  const interval = setInterval(() => {
+    game.run();
+  }, game_speed);
+</script>

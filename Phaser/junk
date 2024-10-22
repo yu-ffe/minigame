@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            SINGLECODE
+        </title>
+    </head>
+    <body>
+        <canvas id = "game">
+            
+        </canvas>
+        <div class = "status" id = "x"></div>
+        <div class = "status" id = "y"></div>
+        <div class = "status" id = "z"></div>
+    </body>
+</html>
+
+<style>
+    #game{
+        width: 1024px;
+        height: 512px;
+        background-color: azure;
+    }
+</style>
+
+<script type="text/javascript">
+    class Object{
+        _image = new Image();
+        constructor(name, x = 0, z = 0, y = 0){
+            this._name = name;
+            this._x = x;
+            this._z = z;
+            this._y = y;
+        }
+        get(){
+            return this._name;
+        }
+    }
+    class Entity extends Object{
+        _moveIndex = [];
+        constructor(speed = 1){
+            super();
+            this._moveIndex["ArrowUp"] = false;
+            this._moveIndex["ArrowLeft"] = false;
+            this._moveIndex["ArrowDown"] = false;
+            this._moveIndex["ArrowRight"] = false;
+            this._moveIndex[" "] = false;
+            this.flying = false;
+            this._moveSpeed = speed;
+            const interval = setInterval(()=>{
+                if(this._moveIndex["ArrowUp"] && this._z >= 1) --this._z;
+                if(this._moveIndex["ArrowDown"] && this._z < 2048) ++this._z;
+                if(this._moveIndex["ArrowRight"] && this._x < 2048) ++this._x;
+                if(this._moveIndex["ArrowLeft"] && this._x >= 1) --this._x;
+                if(this._moveIndex[" "] && !this.flying) {
+                    this.flying = true;
+                    this.jump(7);
+                    this.fall(0);
+                }
+            }, 10);
+        }
+        fall(speed){
+            setTimeout(()=>{
+                this._y -= speed;
+                if(this._y < 0) this._y = 0;
+                if(this._y == 0) {
+                    this.flying = false;
+                    return;
+                }
+                this.fall(speed + 0.5);
+            }, 30)
+        }
+        jump(speed){
+            if(speed <= 0) return;
+            setTimeout(()=>{
+                this._y += speed;
+                this.jump(speed - 0.5);
+            }, 30)
+        }
+    }
+    class TestEntity extends Entity{
+        constructor(){
+            const x = Math.random() * 100;
+            const y = Math.random() * 100;
+            super("testEntity", x, y);
+            this._image.src = "./texture2.png";
+        }
+    }
+    class Actor extends Entity{
+        constructor(){
+            super("player", 10, 10);
+            this._image.src = "./texture.png";
+            window.addEventListener("keydown", (e) => {
+                this._moveIndex[e.key] = true;
+            });
+            window.addEventListener("keyup", (e) => {
+                this._moveIndex[e.key] = false;
+            });
+        }
+    }
+    class Tile{
+        constructor(){
+
+        }
+    }
+    class Game{
+        speed = 60 // 프레임 n/1000
+        //setting
+        canvas = document.getElementById('game');
+        ctx = this.canvas.getContext("2d");
+        //draw
+        tile = new Tile(); // 나중에 추가
+        actor = new Actor();
+        testEntity = new TestEntity();
+        //object
+        entity_x = [100];
+        entity_y = [100];
+        //algorithm
+        constructor(){
+            const interval = setInterval(()=>{
+                this.animate();
+                this.draw();
+            }, this.speed)
+        }
+        animate(){
+        }
+        draw(){
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+            for(let i = 0; i <= 8; i++){
+                this.ctx.beginPath();
+                this.ctx.moveTo((8 - i) * 8 - 32 + this.actor._z % 8, i * 16 - this.actor._z % 16);
+                this.ctx.lineTo(256 + 32 - i * 8 + this.actor._z % 8, i * 16 - this.actor._z % 16); // 256으로
+                this.ctx.stroke();
+            }
+            for(let i = 0; i <= 7; i++){
+                this.ctx.beginPath();
+                this.ctx.moveTo(i * 32 + 64 - this.actor._x % 32, 0 );
+                this.ctx.lineTo(i * 32 - this.actor._x % 32, 128);
+                this.ctx.stroke();
+            }
+
+            this.ctx.drawImage(this.actor._image, 128, 64 - this.actor._y , 8, 8);
+
+            
+
+            this.ctx.drawImage(this.testEntity._image, this.testEntity._x, this.testEntity._z, 8, 8);
+        }
+    }
+    const game = new Game();
+</script>

@@ -1,0 +1,13 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Prevents scrollbars */
+    height: 100%; /* Ensure the body takes the full height of the viewport */
+  }
+  
+  #phaser-game {
+    display: block; /* Ensure no extra space around the canvas */
+    width: 100vw; /* Full viewport width */
+    height: 100vh; /* Full viewport height */
+  }
+  
